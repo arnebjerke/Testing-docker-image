@@ -19,6 +19,6 @@ steps:
   inputs:
     serviceConnectionEndpoint: 'SnykUsedforPipelinePurposes'
     testType: 'app'
-    severityThreshold: 'high'
     monitorWhen: 'always'
+    monitorOnBuild: True
     failOnIssues: true
