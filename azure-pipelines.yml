@@ -1,18 +1,31 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
-- main
+- master
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK'
+  inputs:
+    version: '3.x'
+    includePreviewVersions: true
+
+- script: dotnet build --configuration Release
+  displayName: 'Build Application'
+
+- script: dotnet test --configuration Release
+  displayName: 'Run Tests'
+
+- script: dotnet publish --configuration Release
+  displayName: 'Publish Application Artifacts'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/<PathToPublish>'
+    ArtifactName: 'drop'
+    publishLocation: 'container'
 
 - task: SnykSecurityScan@1
   inputs:
