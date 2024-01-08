@@ -12,7 +12,7 @@ steps:
 - script: |
     npm install
     npm run build
-  displayname: 'npm install and build'
+  displayName: 'npm install and build'
    
 
 - task: SnykSecurityScan@1
