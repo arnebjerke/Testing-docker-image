@@ -1,20 +1,48 @@
 trigger:
-- main
+- master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 steps:
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
-  workingDirectory: 'arnebjerke'
 
-- task: SnykSecurityScan@1
+- task: UseDotNet@2
   inputs:
-    serviceConnectionEndpoint: 'SnykUsedforPipelinePurposes'
-    testType: 'app'
-    severityThreshold: 'high'
-    monitorWhen: 'always'
-    failOnIssues: true
+    packageType: 'sdk'
+    version: '5.x'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore Packages'
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build Application'
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration Release'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Run Tests'
+  inputs:
+    command: 'test'
+    projects: '**/*tests/*.csproj'
+    arguments: '--configuration Release --logger trx --collect "Code coverage"'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  inputs:
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '**/*.trx'
+    mergeTestResults: true
+    failTaskOnFailedTests: true
+
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish Code Coverage Results'
+  inputs:
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.opencover.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/coveragereport'
+    failIfCoverageEmpty: true
+    failIfCoverageBelow: 80
