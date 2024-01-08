@@ -27,3 +27,12 @@ stages:
         dockerfile: '$(Build.SourcesDirectory)/api/Dockerfile'
         tags: |
           $(tag)
+- task: SnykSecurityScan@1
+  inputs:
+    serviceConnectionEndpoint: 'SnykUsedforPipelinePurposes'
+    testType: 'container'
+    dockerImageName: 'Testing-docker-image'
+    dockerfilePath: 'dockerfile'
+    severityThreshold: 'high'
+    monitorWhen: 'always'
+    failOnIssues: true
