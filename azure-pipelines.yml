@@ -31,8 +31,7 @@ stages:
   inputs:
     serviceConnectionEndpoint: 'SnykUsedforPipelinePurposes'
     testType: 'container'
-    dockerImageName: 'Testing-docker-image'
-    dockerfilePath: 'dockerfile'
+    dockerImageName: 'Wordsmith App'
     severityThreshold: 'high'
     monitorWhen: 'always'
     failOnIssues: true
